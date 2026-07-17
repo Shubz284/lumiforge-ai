@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  isTrialUser   Boolean    @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  credits       Int       @default(0)
+  accounts      Account[]
+  images        Image[]
+  sessions      Session[]
+  creditTransactions  CreditTransaction[]
+  payments       Payment[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Image {
+  id            String      @id @default(cuid())
+  userId        String
+  prompt        String
+  model         String
+  resolution    String?
+  aspectRatio   String?
+  imageKey      String
+  storageUrl    String
+  mediaType     String
+  status        ImageStatus @default(PENDING)
+  providerJobId String?
+  cost          Float?
+  creditCost    Int?
+  error         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("image")
+}
+
+enum ImageStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum CreditTxnType {
+  PURCHASE
+  SPEND
+  REFUND
+  BONUS
+  ADJUSTMENT
+}
+
+
+model CreditTransaction {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type          CreditTxnType
+  amount        Int
+  balanceAfter  Int
+
+  description   String?
+  referenceType String?
+  referenceId   String?
+
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([referenceType, referenceId])
+  @@map("credit_transaction")
+}
+
+// Lifecycle of a Razorpay credit purchase.
+enum PaymentStatus {
+  CREATED // order created, awaiting payment
+  PAID    // payment verified, credits granted
+  FAILED  // payment failed / abandoned
+}
+
+// A Razorpay order to buy a credit pack. Credits are granted exactly once when
+// the payment is verified (the unique razorpayOrderId guards against double-grant).
+model Payment {
+  id     String        @id @default(cuid())
+  userId String
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status PaymentStatus @default(CREATED)
+
+  // The pack the user is buying (see CREDIT_PACKS in the backend).
+  packId String
+
+  // Amount in the smallest currency unit (paise for INR) and the ISO currency.
+  amount   Int
+  currency String @default("INR")
+
+  // Credits to grant on success (base pack credits + any bonus).
+  credits Int
+
+  // Razorpay identifiers. orderId is created up front; paymentId/signature are
+  // filled in on verification.
+  razorpayOrderId   String  @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("payment")
+}

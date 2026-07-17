@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LumiForge AI Payment Test</title>
+</head>
+<body>
+
+  <h1>LumiForge AI - Razorpay Test</h1>
+
+  <button onclick="buyPack('starter')">
+    Buy Starter (₹499)
+  </button>
+
+  <button onclick="buyPack('pro')">
+    Buy Pro (₹1999)
+  </button>
+
+  <button onclick="buyPack('studio')">
+    Buy Studio (₹4999)
+  </button>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <script>
+    async function buyPack(packId) {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/v1/payments/create-order",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include", // send auth cookie
+            body: JSON.stringify({
+              packId,
+            }),
+          }
+        );
+
+        const order = await response.json();
+
+        console.log("Backend Response:", order);
+
+        if (!response.ok) {
+          alert(order.error || "Failed to create order");
+          return;
+        }
+
+        const options = {
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          order_id: order.orderId,
+
+          name: "LumiForge AI",
+          description: `${order.packName} • ${order.credits} Credits`,
+
+          prefill: {
+            name: "Shubham",
+            email: "shubham@gmail.com",
+            contact: "9999999999",
+          },
+
+          theme: {
+            color: "#6366F1",
+          },
+
+          handler: function (response) {
+            console.log("Payment Success:", response);
+
+            alert("Payment Successful!");
+
+            console.log(response);
+          },
+
+          modal: {
+            ondismiss: function () {
+              console.log("Checkout Closed");
+            },
+          },
+        };
+
+        const rzp = new Razorpay(options);
+
+        rzp.on("payment.failed", function (response) {
+          console.error(response.error);
+
+          alert(response.error.description);
+        });
+
+        rzp.open();
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong.");
+      }
+    }
+  </script>
+
+</body>
+</html>
