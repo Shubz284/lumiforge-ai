@@ -1,0 +1,21 @@
+// src/lib/api.ts
+const API_BASE = "http://localhost:3000/api/v1";
+
+export async function apiFetch(path: string, options: RequestInit = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    credentials: "include", // sends the session cookie
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw { status: res.status, ...json };
+  }
+
+  return json.data;
+}
