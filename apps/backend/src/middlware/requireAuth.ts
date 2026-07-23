@@ -7,13 +7,13 @@ export interface AuthedRequest extends Request{
 }
 
 export async function requireAuth(req:Request, res:Response, next:NextFunction){
-    // const session = await auth.api.getSession({
-    //     headers:req.headers as any
-    // })
+    const session = await auth.api.getSession({
+        headers:req.headers as any
+    })
 
-    // if(!session?.user){
-    //     return res.status(401).json(ErrorResponse("Not authenticated"));
-    // }
-    (req as AuthedRequest).userId = "ixNmnbhKJUn2aZinh7ztIP1ou8JW6c71";
+    if(!session?.user){
+        return res.status(401).json(ErrorResponse("Not authenticated"));
+    }
+    (req as AuthedRequest).userId = session.user.id;
     next();
 }

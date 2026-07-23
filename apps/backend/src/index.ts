@@ -17,8 +17,7 @@ app.use(
   cors({
     // env.FRONTEND_URL is a list of allowed origins (multiple domains).
     origin: [
-      process.env.FRONTEND_URL!,
-      "http://127.0.0.1:5500"
+      process.env.FRONTEND_URL!
     ],
     credentials: true,
   }),

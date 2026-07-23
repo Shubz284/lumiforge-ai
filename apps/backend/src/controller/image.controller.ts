@@ -119,7 +119,13 @@ export async function createImage(req: Request, res: Response) {
       });
     }
 
-    return res.json({ success: true, image: record });
+    const data = {
+      id: record.id,
+      prompt: record.prompt,
+      storageUrl: record.storageUrl,
+    };
+
+    return res.status(201).json(SuccessResponse(data));
   } catch (err) {
     if (spendTxnId!) {
       const userAfterRefund = await prisma.user.update({

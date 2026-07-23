@@ -68,4 +68,5 @@ export const auth = betterAuth({
       },
     },
   },
+  trustedOrigins: [process.env.FRONTEND_URL!],
 });
