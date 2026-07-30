@@ -36,7 +36,6 @@ const CreditsPage = () => {
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
   const [filter, setFilter] = useState<"ALL" | "SPEND" | "REFUND" | "BONUS">("ALL");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => { 
     apiFetch("/credits")
@@ -64,21 +63,6 @@ const CreditsPage = () => {
     return <CreditsPageSkeleton/>;
   }
 
-  if (error) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 font-medium">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 rounded-lg bg-black px-4 py-2 text-white"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="p-2 mt-2 ml-4 mr-4 h-full w-auto sm:ml-9 sm:mr-9">

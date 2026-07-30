@@ -93,7 +93,7 @@ const ImageCard = ({ image, onPreview, onDownload, onDelete }: ImageCardProps) =
           <Button
             variant="outline"
             className="flex-1 cursor-pointer"
-            onClick={(e) => {
+            onClick={() => {
               onDownload(image);
             }}
           >
