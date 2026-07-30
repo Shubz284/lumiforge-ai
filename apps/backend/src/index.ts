@@ -17,9 +17,8 @@ const app = express();
 app.use(
   cors({
     // env.FRONTEND_URL is a list of allowed origins (multiple domains).
-    origin: [
-      process.env.FRONTEND_URL!
-    ],
+    origin: [process.env.FRONTEND_URL!, 
+      "https://lumiforge-ai.vercel.app"],
     credentials: true,
   }),
 );
@@ -35,6 +34,15 @@ app.post(
 );
 
 app.use(express.json());
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "LumiForge API is running",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use("/api/v1", imageRouter);
 app.use("/api/v1", paymentRouter);
 app.use("/api/v1", modelsRouter);
