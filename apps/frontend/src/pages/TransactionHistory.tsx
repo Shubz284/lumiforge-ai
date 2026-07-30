@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import TransactionHistorySkeleton from "@/components/skeleton/TransactionHistorySkeleton";
+import { toast } from "sonner";
 
 interface Payment {
   id: string;
@@ -52,14 +53,13 @@ function packLabel(packId: string) {
 const TransactionHistory = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     apiFetch("/payments/transactions")
       .then((data) => setPayments(data))
       .catch((err) => {
         console.error("Failed to load payments:", err);
-        setError("Could not load your transaction history.");
+        toast.error("Could not load your transaction history.");
       })
       .finally(() => setLoading(false));
   }, []);
