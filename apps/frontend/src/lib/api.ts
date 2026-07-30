@@ -1,6 +1,8 @@
 // src/lib/api.ts
 export const API_BASE = import.meta.env.VITE_API_BASE;
 
+console.log("VITE_API_BASE =", API_BASE);
+
 export async function apiFetch(path: string, options: RequestInit = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
