@@ -15,6 +15,10 @@ import {
   ReceiptText,
   Settings,
 } from "lucide-react";
+import Profile from "./Profile";
+
+const linkClass =
+  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-neutral-700 hover:bg-neutral-200 hover:text-neutral-900 transition-colors cursor-pointer";
 
 export function AppSidebar() {
   return (
@@ -24,58 +28,46 @@ export function AppSidebar() {
           <span className="font-medium text-xl">Lumiforge AI</span>
           <img
             src={lumiforgeIcon}
-            className="w-5 bg-blue-50 rounded-md border-red-200 red-200 h-5"
+            className="w-5 h-5 rounded-md bg-blue-50"
             alt="app-icon"
           />
         </div>
       </SidebarHeader>
-      <SidebarContent className="mt-3 ml-2 flex  items-center">
+      <SidebarContent className="mt-4 ml-2 flex flex-col gap-1 items-stretch">
         <SidebarGroup>
-          <Link
-            to="generate-image"
-            className="flex cursor-pointer text-neutral-800 rounded-lg hover:bg-neutral-200 p-2 gap-2 items-center"
-          >
-            <Image size={16} />
+          <Link to="generate-image" className={linkClass}>
+            <Image size={19} />
             <span>Generate Image</span>
           </Link>
         </SidebarGroup>
         <SidebarGroup>
-          <Link
-            to={"images"}
-            className="flex text-md font-serif  cursor-pointer rounded-lg  hover:bg-neutral-200 p-2  gap-2 items-center"
-          >
-            <LayoutGrid size={16} />
+          <Link to="images" className={linkClass}>
+            <LayoutGrid size={19} />
             <span>My Images</span>
           </Link>
         </SidebarGroup>
         <SidebarGroup>
-          <Link 
-           to={"transactions"}
-           className="flex text-md cursor-pointer rounded-lg  hover:bg-neutral-200 p-2  gap-2 items-center">
-            <ReceiptText size={16} />
+          <Link to="transactions" className={linkClass}>
+            <ReceiptText size={19} />
             <span>Transactions</span>
           </Link>
         </SidebarGroup>
         <SidebarGroup>
-          <Link
-          to={"credits"}
-           className="flex text-md cursor-pointer rounded-lg  hover:bg-neutral-200 p-2  gap-2 items-center">
-            <BadgeDollarSign size={16} />
+          <Link to="credits" className={linkClass}>
+            <BadgeDollarSign size={19} />
             <span>Credits</span>
           </Link>
         </SidebarGroup>
         <SidebarGroup>
-          <Link 
-           to={"setting"}
-          className="flex text-md cursor-pointer rounded-lg  hover:bg-neutral-200 p-2  gap-2 items-center">
-            <Settings size={16} />
+          <Link to="setting" className={linkClass}>
+            <Settings size={19} />
             <span>Setting</span>
           </Link>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="bg-slate-300 cursor-pointer p-2 rounded-lg">
-          <span>Profile</span>
+        <div>
+          <Profile />
         </div>
       </SidebarFooter>
     </Sidebar>

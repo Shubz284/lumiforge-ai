@@ -1,5 +1,17 @@
-import { apiFetch } from "@/lib/api";
+import GenerateImagesSkeleton from "@/components/skeleton/GenerateImagesSkeleton";
+import ImageCard from "@/components/ImageCard";
+import ImagePreviewModal from "@/components/ImagePreviewModal";
+import { useCredits } from "@/context/CreditsContext";
+import { API_BASE, apiFetch } from "@/lib/api";
+import {
+  filenameFromContentDisposition,
+  filenameFromUrl,
+} from "@/lib/download";
+
+import { MoveRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 interface ImageModel {
   id: string;
@@ -10,10 +22,12 @@ interface ImageModel {
   supportsReferences: boolean;
 }
 
-interface GeneratedImage {
+export interface GeneratedImage {
   id: string;
   storageUrl: string;
   prompt: string;
+  model: string;
+  createdAt: string;
 }
 
 const ALLOWED_MODEL_IDS = [
@@ -29,18 +43,23 @@ const DEFAULT_MODEL_ID = "sourceful/riverflow-v2.5-fast";
 
 const GenerateImages = () => {
   const [allModels, setAllModels] = useState<ImageModel[]>([]);
-  const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_MODEL_ID);
+  const [selectedModelId, setSelectedModelId] =
+    useState<string>(DEFAULT_MODEL_ID);
   const [prompt, setPrompt] = useState("");
   const [resolution, setResolution] = useState<string>("");
   const [aspectRatio, setAspectRatio] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recentImages, setRecentImages] = useState<GeneratedImage[]>([]);
+  const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(
+    null,
+  );
+  const [pageLoading, setPageLoading] = useState(true);
+  const { refetchCredits } = useCredits();
 
   const allowedModels = useMemo(
     () => allModels.filter((m) => ALLOWED_MODEL_IDS.includes(m.id)),
     [allModels],
-    
   );
 
   const selectedModel = useMemo(
@@ -48,12 +67,32 @@ const GenerateImages = () => {
     [allowedModels, selectedModelId],
   );
 
+  // useEffect(() => {
+  //   apiFetch("/image/models")
+  //     .then((response) => {
+  //       setAllModels(response.modelLists ?? []);
+  //     })
+  //     .catch((err) => console.error("Failed to load models:", err));
+  // }, []);
+
   useEffect(() => {
-    apiFetch("/image/models")
-      .then((response) => {
-        setAllModels(response.modelLists ?? []);
-      })
-      .catch((err) => console.error("Failed to load models:", err));
+    async function loadPage() {
+      try {
+        const [modelsResponse, imagesResponse] = await Promise.all([
+          apiFetch("/image/models"),
+          apiFetch("/images"),
+        ]);
+
+        setAllModels(modelsResponse.modelLists ?? []);
+        setRecentImages(imagesResponse.images ?? imagesResponse);
+      } catch (err) {
+        console.error("Failed to load page:", err);
+      } finally {
+        setPageLoading(false);
+      }
+    }
+
+    loadPage();
   }, []);
 
   useEffect(() => {
@@ -62,11 +101,67 @@ const GenerateImages = () => {
     setAspectRatio(selectedModel.supported_aspect_ratios?.[0] ?? "");
   }, [selectedModel]);
 
-  useEffect(() => {
-    apiFetch("/images")
-      .then((data) => setRecentImages(data.images ?? data))
-      .catch((err) => console.error("Failed to load images:", err));
-  }, [recentImages]);
+  // useEffect(() => {
+  //   apiFetch("/images")
+  //     .then((data) => setRecentImages(data.images ?? data))
+  //     .catch((err) => console.error("Failed to load images:", err));
+  // }, []);
+
+  const handleDelete = async (image: GeneratedImage) => {
+    try {
+      await apiFetch(`/images/${image.id}`, {
+        method: "DELETE",
+      });
+
+      setRecentImages((prev) => prev.filter((img) => img.id !== image.id));
+      toast.success("Image deleted successfully.");
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast.error("Unable to delete image.");
+    }
+  };
+
+  const handleDownload = async (image: GeneratedImage) => {
+    try {
+      const res = await fetch(`${API_BASE}/images/${image.id}/download`, {
+        credentials: "include", // sends the session cookie — see note below
+      });
+
+      if (!res.ok) {
+        throw new Error("Download failed");
+      }
+
+      const blob = await res.blob();
+      const contentType = res.headers.get("content-type") ?? blob.type;
+      if (!contentType.startsWith("image/")) {
+        const preview = (await blob.text()).slice(0, 120);
+        throw new Error(
+          `Unexpected download response: ${contentType || "unknown"} ${preview}`,
+        );
+      }
+
+      const filename =
+        filenameFromContentDisposition(
+          res.headers.get("content-disposition"),
+        ) ?? filenameFromUrl(image.storageUrl, image.id, contentType);
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.style.display = "none";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("Download started.");
+    } catch (err) {
+      console.error("Download error:", err);
+      toast.error("Couldn't download image. Please try again.");
+    }
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -88,10 +183,11 @@ const GenerateImages = () => {
         }),
       });
 
-      console.log("GENERATE RESULT:", result);
 
       setRecentImages((prev) => [result, ...prev]);
       setPrompt("");
+      // refresh the shared credits value now that a generation just spent some
+      await refetchCredits();
     } catch (err: any) {
       if (err.status === 403) {
         setError(err.details ?? "This model requires a paid plan");
@@ -103,14 +199,20 @@ const GenerateImages = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  if (pageLoading) {
+    return <GenerateImagesSkeleton />;
   }
 
   return (
-    <div className="border-2 mt-2 ml-9 mr-9 h-full w-auto">
+    <div className=" mt-2 ml-9 mr-9 h-full w-auto">
       <div>
         <div className="mt-3 ml-4">
-          <h1 className="text-xl font-medium">✨ Create Images</h1>
-          <h4 className="mt-1">Bring your imagination to life.</h4>
+          <h1 className="text-2xl font-bold text-gray-900">✨ Create Images</h1>
+          <h4 className="mt-1 text-sm text-gray-500">
+            Bring your imagination to life.
+          </h4>
         </div>
         <div className="mt-3 ml-4 mr-4 p-6 rounded-2xl border bg-white ">
           <div>
@@ -176,16 +278,28 @@ const GenerateImages = () => {
 
         <div className="flex justify-between mt-3 ml-9 mr-9">
           <span className="text-lg font-medium">Recent Generations</span>
-          <span>{recentImages.length} Total</span>
+          <Link to="/dashboard/images">
+            <span className=" relative flex text-sm items-center justify-center">
+              View All <MoveRight className="w-4 h-3" />
+              <span className="absolute flex left-0.5 -bottom-1 w-3/4 h-0.5 bg-black"></span>
+            </span>
+          </Link>
         </div>
 
-        <div className="grid grid-cols-4 gap-3 mt-3 ml-9 mr-9">
-          {recentImages.map((img) => (
-            <img
+        <ImagePreviewModal
+          image={selectedImage}
+          open={!!selectedImage}
+          onClose={() => setSelectedImage(null)}
+        />
+
+        <div className="grid m-4 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {recentImages.slice(0, 4).map((img) => (
+            <ImageCard
               key={img.id}
-              src={img.storageUrl}
-              alt={img.prompt}
-              className="aspect-square object-cover rounded-lg border"
+              image={img}
+              onPreview={setSelectedImage}
+              onDownload={handleDownload}
+              onDelete={handleDelete}
             />
           ))}
         </div>

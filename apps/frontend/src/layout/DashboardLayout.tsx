@@ -5,17 +5,21 @@ import { Outlet } from "react-router-dom";
 
 export default function DashboardLayout() {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main className="flex min-h-svh flex-1 flex-col">
-        <div className="sticky flex shrink-0 gap-2 justify-center mt-2">
-          <SidebarTrigger className={"cursor-pointer"} />
-          <Appbar />
-        </div>
-        <div className="flex-1 min-h-0  ">
-          <Outlet />
-        </div>
-      </main>
-    </SidebarProvider>
+      <SidebarProvider>
+        <AppSidebar />
+
+        <main className="flex h-screen flex-1 flex-col overflow-hidden">
+          {/* Top Navigation */}
+          <div className="sticky top-0 z-10 flex shrink-0 items-center gap-2 mt-2">
+            <SidebarTrigger className="cursor-pointer" />
+            <Appbar />
+          </div>
+
+          {/* Scrollable Page Content */}
+          <div className="flex-1 overflow-y-auto">
+            <Outlet />
+          </div>
+        </main>
+      </SidebarProvider>
   );
 }

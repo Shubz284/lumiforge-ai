@@ -1,5 +1,5 @@
 // src/lib/api.ts
-const API_BASE = "http://localhost:3000/api/v1";
+export const API_BASE = "http://localhost:3000/api/v1";
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -18,4 +18,15 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   }
 
   return json.data;
+}
+
+export interface ApiError {
+  status: number;
+  success?: boolean;
+  data?: unknown;
+  error?: string;
+}
+
+export function isApiError(err: unknown): err is ApiError {
+  return typeof err === "object" && err !== null && "status" in err;
 }

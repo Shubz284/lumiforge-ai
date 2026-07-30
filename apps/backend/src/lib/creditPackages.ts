@@ -17,9 +17,9 @@ export const CREDIT_PACKS: CreditPack[] = [
     id: "starter",
     name: "Starter",
     description:"Perfect for exploring AI image generation and creating your first masterpieces.",
-    priceInr: 499,
-    amountPaise: 499_00,
-    baseCredits: 500,
+    priceInr: 599,
+    amountPaise: 599_00,
+    baseCredits: 100,
     bonusCredits: 0,
   },
   {
@@ -28,8 +28,8 @@ export const CREDIT_PACKS: CreditPack[] = [
     description:"Built for creators with frequent generations. Includes 10% bonus credits.",
     priceInr: 1999,
     amountPaise: 1999_00,
-    baseCredits: 2000,
-    bonusCredits: 200,
+    baseCredits: 400,
+    bonusCredits:50,
   },
   {
     id: "studio",
@@ -37,8 +37,8 @@ export const CREDIT_PACKS: CreditPack[] = [
     description:"Designed for professionals and teams with high-volume image generation. Includes 20% bonus credits.",
     priceInr: 4999,
     amountPaise: 4999_00,
-    baseCredits: 5000,
-    bonusCredits: 1000,
+    baseCredits: 1000,
+    bonusCredits: 150,
   },
 ];
 

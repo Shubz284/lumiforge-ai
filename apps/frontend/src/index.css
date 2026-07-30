@@ -134,3 +134,8 @@
     @apply min-h-svh;
   }
 }
+
+html {
+  overflow-y: scroll;
+}
+

@@ -25,7 +25,7 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
 
   const pack = findPack(parsed.data.packId);
   if (!pack) {
-    res.status(404).json({ error: "Unknown pack." });
+    res.status(404).json(ErrorResponse("Unknown pack."));
     return;
   }
 
@@ -55,17 +55,19 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
       },
     });
 
-    res.json({
+    const data = {
       orderId: razorpayOrder.id,
       amount: razorpayOrder.amount,
       currency: razorpayOrder.currency,
-      keyId: process.env.RAZORPAY_KEY_ID,
+      keyId: process.env.RAZORPAY_KEY_ID!,
       packName: pack.name,
       credits: totalCredits,
-    });
+    };
+
+    res.status(201).json(SuccessResponse(data));
   } catch (error) {
     console.error("Order creation failed:", error);
-    return res.status(502).json({ error: "Failed to create Razorpay order" });
+    return res.status(502).json(ErrorResponse("Failed to create Razorpay order"));
   }
 };
 
@@ -101,7 +103,9 @@ export const verifyPayment = async (req: Request, res: Response) => {
         status: "FAILED",
       },
     });
-    res.status(400).json({ error: "Payment signature verification failed." });
+    res
+      .status(400)
+      .json(ErrorResponse("Payment signature verification failed."));
     return;
   }
 
@@ -134,7 +138,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .json(SuccessResponse(`Payment verified successfully: ${data}`));
+      .json(SuccessResponse(data));
   } catch (error) {
     console.error(
       "verifyPayment failed:",
@@ -167,14 +171,14 @@ export async function creditsWebhookHandler(
       "Webhook JSON parse failed:",
       err instanceof Error ? err.message : err,
     );
-    res.status(200).json({ status: "ignored" });
+    res.status(200).json(SuccessResponse({ status: "ignored" }));
     return;
   }
 
   const entity = event.payload?.payment?.entity;
 
   if (event.event !== "payment.captured" || !entity?.order_id || !entity.id) {
-    res.status(200).json({ status: "ok" }); // nothing to do, acknowledge anyway
+    res.status(200).json(SuccessResponse({ status: "ok" })); // nothing to do, acknowledge anyway
     return;
   }
 
@@ -186,18 +190,44 @@ export async function creditsWebhookHandler(
 
     if (!paymentRecord) {
       console.error("No matching payment for order", entity.order_id);
-      res.status(200).json({ status: "ok" }); // not retryable, don't error
+      res.status(200).json(SuccessResponse({ status: "ok" })); // not retryable, don't error
       return;
     }
 
     await fulfillPayment(paymentRecord, entity.id, null); // null result = already fulfilled, fine either way
 
-    res.status(200).json({ status: "ok" });
+    res.status(200).json(SuccessResponse({ status: "ok" }));
   } catch (err) {
     console.error(
       "fulfillPayment failed:",
       err instanceof Error ? err.message : err,
     );
-    res.status(500).json({ error: "fulfillment failed" }); // retryable
+    res.status(500).json(ErrorResponse("fulfillment failed")); // retryable
+  }
+}
+
+export const transactionHistory = async(req:Request, res:Response) => {
+  const userId = (req as AuthedRequest) .userId;
+
+  try {
+    const payments = await prisma.payment.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+      select: {
+        id: true,
+        status: true,
+        packId: true,
+        amount: true,
+        credits: true,
+        createdAt: true,
+      },
+    })
+
+    if(!payments) return res.status(402).json(ErrorResponse("Failed to fetch transaction history"))
+    res.status(200).json(SuccessResponse(payments))
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json(ErrorResponse("SERVER ERROR"))
   }
 }

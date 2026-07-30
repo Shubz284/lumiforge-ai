@@ -14,21 +14,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import GoogleIcon from "../assets/google.png";
 import { toast } from "sonner";
+import { Link, useLocation } from "react-router-dom";
 
 interface AuthFormProps {
   onSuccess?: () => void;
+  mode: string;
   callbackURL?: string;
 }
 
-type mode = "signup" | "signin";
+// type mode = "signup" | "signin";
 
-const AuthForm = ({ onSuccess }: AuthFormProps) => {
-  const [mode, setMode] = useState<mode>("signup");
+const AuthForm = ({ onSuccess, mode }: AuthFormProps) => {
+  // const [mode, setMode] = useState<mode>("signup");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+
+  const location = useLocation();
+  const next = new URLSearchParams(location.search).get("next") || "/dashboard";
+  const pack = new URLSearchParams(location.search).get("pack");
+  const target = pack ? `${next}?pack=${pack}` : next;
+
+  // Carries ?next=...&pack=... (or any other query string) across the
+  // signup <-> login toggle, so a logged-out "Buy Pro" click doesn't lose
+  // its destination just because the user has to switch forms first.
+    const toggleTarget = `${mode === "signup" ? "/login" : "/signup"}${
+      location.search
+    }`;
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -57,9 +73,13 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
 
   const handleGoogleLogin = async () => {
     setError(null);
+    // Google's OAuth redirect leaves the SPA entirely, so query params
+    // can't be recovered the way onSuccess() does for email/password.
+    // Forward next/pack through callbackURL instead, and have the
+    // /dashboard/billing route (or wherever callbackURL lands) read them.
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: `${window.location.origin}/dashboard`,
+      callbackURL: `${window.location.origin}${target}`,
     });
   };
   return (
@@ -79,10 +99,12 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
           <CardAction>
             <Button
               variant="link"
-              onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-            >
-              {mode === "signup" ? "Sign in" : "Sign up"}
-            </Button>
+              render={
+                <Link to={toggleTarget}>
+                  {mode === "signup" ? "Sign in" : "Sign up"}
+                </Link>
+              }
+            />
           </CardAction>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -126,7 +148,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
           </CardContent>
           <CardFooter className="flex-col mt-3 gap-2">
             <Button type="submit" className="w-full" disabled={loading}>
-              {mode === "signup" ? "Sign up" : "Sign in"}
+              {mode === "signup" ? "Sign up" : "Login"}
             </Button>
             <Button
               type="button"

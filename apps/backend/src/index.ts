@@ -10,6 +10,7 @@ import creditRouter from "../src/routes/credits.route"
 import { creditsWebhookHandler } from "./controller/payment.controller";
 import { welcomeEmail } from "./emails/welcomeEmail";
 import { sendEmail } from "./service/resend.service";
+import userRouter from "../src/routes/user.routes"
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use("/api/v1", imageRouter);
 app.use("/api/v1", paymentRouter);
 app.use("/api/v1", modelsRouter);
 app.use("/api/v1", creditRouter);
+app.use("/api/v1", userRouter)
 
 // app.get("/test-welcome-email", async (req, res) => {
 //   const email = welcomeEmail();

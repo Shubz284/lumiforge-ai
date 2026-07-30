@@ -123,6 +123,8 @@ export async function createImage(req: Request, res: Response) {
       id: record.id,
       prompt: record.prompt,
       storageUrl: record.storageUrl,
+      model:record.model,
+      createdAt:record.createdAt
     };
 
     return res.status(201).json(SuccessResponse(data));
@@ -244,13 +246,13 @@ export const downLoadImage = async(req:Request, res:Response) => {
     return res.status(400).json(ErrorResponse("Image ID is required"));
   try {
     const image = await prisma.image.findFirst({
-      where:{
-        id:imageId,
-        userId:userId
-      }
-    })
+      where: {
+        id: imageId,
+        userId: userId,
+      },
+    });
 
-    if(!image) return res.status(404).json({ error: "Image not found" });
+    if (!image) return res.status(404).json({ error: "Image not found" });
 
     const object = await r2.send(
       new GetObjectCommand({
@@ -268,12 +270,11 @@ export const downLoadImage = async(req:Request, res:Response) => {
     res.setHeader("Content-Type", image.mediaType);
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${image.id}.${image.mediaType.split("/")[1]}"`,
+      `attachment; filename="lumiforge-${image.id}.${image.mediaType.split("/")[1]}"`,
     );
-
     res.setHeader("Content-Length", buffer.length.toString());
-
-    res.send(buffer);
+    res.setHeader("Cache-Control", "no-store"); // don't let the browser cache/condition future requests
+    res.status(200).end(buffer); // .end(), not .send() — skips Express's auto-ETag/304 check
   } catch (error) {
     return res.status(500).json(ErrorResponse(
       error instanceof Error ? error.message : "Internal Server Error"

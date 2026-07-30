@@ -38,10 +38,9 @@ export async function currentCredits(req:Request, res:Response){
 }
 
 export async function pricingDetails(req:Request, res:Response){
-    res.status(200).json(
-      SuccessResponse({
+  const data = {
         currency: "INR",
-        razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+        razorpayKeyId: process.env.RAZORPAY_KEY_ID!,
         packs: CREDIT_PACKS.map((p) => ({
           id: p.id,
           name: p.name,
@@ -51,6 +50,6 @@ export async function pricingDetails(req:Request, res:Response){
           bonusCredits: p.bonusCredits,
         })),
         creditCostPerGeneration: env.CREDITS_PER_IMAGE,
-      }),
-    )
+  }
+  res.status(200).json(SuccessResponse(data))
 }

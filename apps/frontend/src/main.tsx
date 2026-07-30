@@ -3,10 +3,19 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { Toaster } from "@/components/ui/sonner";
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 
-createRoot(document.getElementById('root')!).render(
+// Create a client
+const queryClient = new QueryClient()
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
-    <Toaster/>
+    <QueryClientProvider client={queryClient}>
+      <App />
+      <Toaster />
+    </QueryClientProvider>
   </StrictMode>,
-)
+);

@@ -11,3 +11,7 @@ from: "LumiForge AI <support@lumiforge.ai>"
  curl -X POST http://localhost:3000/api/auth/request-password-reset \
   -H "Content-Type: application/json" \
   -d '{"email":"shubhamghorpade284@gmail.com","password":"Shubham1976","name":"Shubham"}'
+
+  can u use query on generate page?
+
+  also check the perfect credits acc to pricing page
