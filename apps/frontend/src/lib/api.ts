@@ -1,9 +1,10 @@
-export const API_BASE = import.meta.env.VITE_API_URL;
+// src/lib/api.ts
+export const API_BASE = import.meta.env.VITE_API_BASE;
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
-    credentials: "include",
+    credentials: "include", // sends the session cookie
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
@@ -17,4 +18,15 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   }
 
   return json.data;
+}
+
+export interface ApiError {
+  status: number;
+  success?: boolean;
+  data?: unknown;
+  error?: string;
+}
+
+export function isApiError(err: unknown): err is ApiError {
+  return typeof err === "object" && err !== null && "status" in err;
 }
