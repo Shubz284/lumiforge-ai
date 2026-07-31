@@ -11,12 +11,18 @@ export function verifyPaymentSignature({
   paymentId,
   signature,
 }: VerifyPaymentSignatureParams) {
-  const body = `${orderId}|${paymentId}`;
+  const body = `${orderId}|${paymentId}`
 
   const expectedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
     .update(body)
     .digest("hex");
+
+     console.log("Order ID:", orderId);
+     console.log("Payment ID:", paymentId);
+     console.log("Received Signature:", signature);
+     console.log("Expected Signature:", expectedSignature);
+     console.log("Secret exists:", !!process.env.RAZORPAY_KEY_SECRET);
 
   return timingSafeEqual(expectedSignature, signature);
 }
