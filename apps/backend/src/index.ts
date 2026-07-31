@@ -25,7 +25,6 @@ app.use(
 
 // Better-auth handler must be mounted BEFORE express.json().
 app.all("/api/auth/*splat", toNodeHandler(auth));
-// app.use("/api/auth/v1", authRouter);
 
 app.post(
   "/api/webhook/razorpay",

@@ -68,5 +68,15 @@ export const auth = betterAuth({
       },
     },
   },
+  advanced: {
+    cookiePrefix: "lumiforge",
+    crossSubDomainCookies: {
+      enabled: true, // if frontend/backend are on different subdomains of the same root domain
+    },
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true, // required when sameSite is "none" — cookie only sent over HTTPS
+    },
+  },
   trustedOrigins: [process.env.FRONTEND_URL!],
 });
