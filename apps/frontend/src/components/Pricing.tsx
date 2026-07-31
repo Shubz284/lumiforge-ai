@@ -73,15 +73,17 @@ export default function Pricing({ onPurchaseSuccess, variant = "landing" }: Pric
   const { setCredits } = useCredits();
 
   useEffect(() => {
-    apiFetch("/checkout/pricing")
-      .then((data) => {
-        setPacks(data.packs);
-      })
-      .catch((err) => {
-        console.error("Failed to load pricing:", err);
-        setError("Could not load pricing. Please refresh.");
-      })
-      .finally(() => setLoading(false));
+    const cached = sessionStorage.getItem("pricing_cache");
+    if (cached) {
+      setPacks(JSON.parse(cached));
+      setLoading(false);
+    }
+
+    apiFetch("/checkout/pricing").then((data) => {
+      setPacks(data.packs);
+      sessionStorage.setItem("pricing_cache", JSON.stringify(data.packs));
+      setLoading(false);
+    });
   }, []);
 
   const handleBuy = async (packId: string) => {
@@ -185,7 +187,26 @@ export default function Pricing({ onPurchaseSuccess, variant = "landing" }: Pric
 
   if (loading) {
     return (
-      <div className="py-24 text-center text-gray-500">Loading pricing...</div>
+      <section className="w-full px-6 py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="mx-auto mb-16 max-w-xl text-center animate-pulse">
+            <div className="h-6 w-40 bg-gray-100 rounded-full mx-auto mb-5" />
+            <div className="h-10 w-96 bg-gray-100 rounded mx-auto mb-4" />
+            <div className="h-4 w-80 bg-gray-100 rounded mx-auto" />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-2xl border p-7 animate-pulse">
+                <div className="h-5 w-24 bg-gray-100 rounded mb-3" />
+                <div className="h-4 w-full bg-gray-100 rounded mb-6" />
+                <div className="h-10 w-32 bg-gray-100 rounded mb-6" />
+                <div className="h-20 w-full bg-gray-100 rounded mb-6" />
+                <div className="h-10 w-full bg-gray-100 rounded" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     );
   }
 
