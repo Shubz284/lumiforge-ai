@@ -83,8 +83,8 @@ export const verifyPayment = async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId;
   const parsed = verifyPaymentSchema.safeParse(req.body);
   
-    console.log("RAW BODY:", JSON.stringify(req.body)); // add this
-    console.log("PARSED SUCCESS:", parsed.success); // add this
+    console.log("RAW BODY:", JSON.stringify(req.body));
+    console.log("PARSED SUCCESS:", parsed.success); 
 
     if (!parsed.success) {
       console.log("PARSE ERROR:", parsed.error.flatten()); // add this
