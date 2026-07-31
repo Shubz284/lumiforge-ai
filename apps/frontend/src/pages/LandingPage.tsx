@@ -17,11 +17,11 @@ export default function LandingPage() {
         linear-gradient(to right, rgba(226,232,240,0.7) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(226,232,240,0.7) 1px, transparent 1px)
         `,
-        backgroundSize: "32px 32px",
-        WebkitMaskImage:
-          "radial-gradient(ellipse 80% 65% at 50% 0%, black 55%, transparent 100%)",
-        maskImage:
-          "radial-gradient(ellipse 80% 65% at 50% 0%, black 55%, transparent 100%)",
+          backgroundSize: "32px 32px",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 80% 65% at 50% 0%, black 55%, transparent 100%)",
+          maskImage:
+            "radial-gradient(ellipse 80% 65% at 50% 0%, black 55%, transparent 100%)",
         }}
       />
 
@@ -30,9 +30,15 @@ export default function LandingPage() {
         <Navbar />
         <Hero />
         <Showcase />
-        <Features />
-        <Pricing />
-        <Faq />
+        <section id="features">
+          <Features />
+        </section>
+        <section id="pricing">
+          <Pricing />
+        </section>
+        <section id="faq">
+          <Faq />
+        </section>
         <Footer />
       </div>
     </div>

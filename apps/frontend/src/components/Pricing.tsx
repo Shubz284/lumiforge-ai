@@ -59,8 +59,7 @@ interface PricingProps {
 }
 
 export default function Pricing({ onPurchaseSuccess, variant = "landing" }: PricingProps) {
-  const { data: session, isPending: isSessionPending } =
-    authClient.useSession();
+  const { data: session, isPending: isSessionPending } = authClient.useSession();
   const isAuthenticated = !!session?.user;
 
   const [packs, setPacks] = useState<CreditPack[]>([]);
@@ -122,9 +121,9 @@ export default function Pricing({ onPurchaseSuccess, variant = "landing" }: Pric
         currency: order.currency,
         name: "LumiForge AI",
         description: `${order.packName} • ${order.credits} Credits`,
-        order_id: order.orderId,
-        handler: async (response: any) => {
-          console.log(
+          order_id: order.orderId,
+          handler: async (response: any) => {
+            console.log(
             response.razorpay_order_id,
             response.razorpay_payment_id,
             response.razorpay_signature,
@@ -219,7 +218,7 @@ export default function Pricing({ onPurchaseSuccess, variant = "landing" }: Pric
   }
 
   return (
-    <section className="w-full px-6 py-20">
+    <section id="pricing" className="w-full  px-6 py-20">
       <div className="mx-auto max-w-6xl">
         {variant === "landing" && (
           <div className="mx-auto mb-16 max-w-xl text-center">
