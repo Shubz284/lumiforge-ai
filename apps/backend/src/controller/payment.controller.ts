@@ -64,6 +64,8 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
       credits: totalCredits,
     };
 
+    console.log("order create succesfully")
+
     res.status(201).json(SuccessResponse(data));
   } catch (error) {
     console.error("Order creation failed:", error);

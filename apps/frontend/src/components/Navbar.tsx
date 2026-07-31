@@ -22,7 +22,7 @@ import lumiforgeIcon from "../assets/lumiforge.png"
          <div className="hidden md:flex items-center gap-7 text-sm text-gray-600">
            <a href="#features">Features</a>
            <a href="#pricing">Pricing</a>
-           <a href="#faq">FAQ</a>
+           <a href="#faq">Faq</a>
          </div>
 
          <div className="flex items-center gap-3">
