@@ -17,7 +17,7 @@ export const CREDIT_PACKS: CreditPack[] = [
     id: "starter",
     name: "Starter",
     description:"Perfect for exploring AI image generation and creating your first masterpieces.",
-    priceInr: 599,
+    priceInr: 10,
     amountPaise: 599_00,
     baseCredits: 100,
     bonusCredits: 0,
