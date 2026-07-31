@@ -80,12 +80,16 @@ const verifyPaymentSchema = z.object({
 export const verifyPayment = async (req: Request, res: Response) => {
   const userId = (req as AuthedRequest).userId;
   const parsed = verifyPaymentSchema.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json(ErrorResponse("Invalid request body"));
-  }
+  
+    console.log("RAW BODY:", JSON.stringify(req.body)); // add this
+    console.log("PARSED SUCCESS:", parsed.success); // add this
 
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-    parsed.data;
+    if (!parsed.success) {
+      console.log("PARSE ERROR:", parsed.error.flatten()); // add this
+      return res.status(400).json(ErrorResponse("Invalid request body"));
+    }
+
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =  parsed.data;
 
   const isValid = verifyPaymentSignature({
     orderId: razorpay_order_id,

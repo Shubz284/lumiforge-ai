@@ -121,6 +121,11 @@ export default function Pricing({ onPurchaseSuccess, variant = "landing" }: Pric
         description: `${order.packName} • ${order.credits} Credits`,
         order_id: order.orderId,
         handler: async (response: any) => {
+          console.log(
+            response.razorpay_order_id,
+            response.razorpay_payment_id,
+            response.razorpay_signature,
+          );
           try {
             const result = await apiFetch("/payments/verify", {
               method: "POST",
