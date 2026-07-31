@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { requireAuth } from "../middlware/requireAuth";
-import { createRazorpayOrder, transactionHistory, verifyPayment } from "../controller/payment.controller";
+import { createRazorpayOrder, creditsWebhookHandler, transactionHistory, verifyPayment } from "../controller/payment.controller";
+import { verifyPaymentSignature } from "../lib/verifyPaymentSignature";
 
 const router = Router();
 
