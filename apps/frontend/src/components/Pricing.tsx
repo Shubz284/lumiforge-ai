@@ -113,6 +113,9 @@ export default function Pricing({ onPurchaseSuccess, variant = "landing" }: Pric
         body: JSON.stringify({ packId }),
       });
 
+      console.log("ORDER KEY ID:", order.keyId); // add this
+      console.log("FULL ORDER:", order);
+
       const options = {
         key: order.keyId,
         amount: order.amount,
