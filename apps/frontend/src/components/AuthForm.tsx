@@ -61,6 +61,8 @@ const AuthForm = ({ onSuccess, mode }: AuthFormProps) => {
       if (result.error) {
         setError(result.error.message ?? "Signup failed");
       } else {
+        await authClient.getSession();
+        console.log("session after getSession")
         toast.success("Successfully logged in");
         onSuccess?.();
       }

@@ -206,15 +206,17 @@ const GenerateImages = () => {
   }
 
   return (
-    <div className=" mt-2 ml-9 mr-9 h-full w-auto">
+    <div className="mt-2 mx-3 sm:mx-6 md:ml-9 md:mr-9 h-full w-auto">
       <div>
-        <div className="mt-3 ml-4">
-          <h1 className="text-2xl font-bold text-gray-900">✨ Create Images</h1>
+        <div className="mt-3 ml-1 sm:ml-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            ✨ Create Images
+          </h1>
           <h4 className="mt-1 text-sm text-gray-500">
             Bring your imagination to life.
           </h4>
         </div>
-        <div className="mt-3 ml-4 mr-4 p-6 rounded-2xl border bg-white ">
+        <div className="mt-3 ml-1 mr-1 sm:ml-4 sm:mr-4 p-4 sm:p-6 rounded-2xl border bg-white">
           <div>
             <label className="block text-sm font-medium mb-2">Prompt</label>
             <textarea
@@ -227,9 +229,9 @@ const GenerateImages = () => {
 
           {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
 
-          <div className="flex  items-end gap-3 mt-2">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-3 mt-2">
             <select
-              className="h-12 w-[35%] cursor-pointer rounded-lg border px-4"
+              className="h-12 w-full sm:w-[35%] cursor-pointer rounded-lg border px-4"
               value={selectedModelId}
               onChange={(e) => setSelectedModelId(e.target.value)}
             >
@@ -240,34 +242,36 @@ const GenerateImages = () => {
               ))}
             </select>
 
-            <select
-              className="h-12 cursor-pointer flex-1 rounded-lg border px-4"
-              value={resolution}
-              onChange={(e) => setResolution(e.target.value)}
-              disabled={!selectedModel?.supported_resolutions?.length}
-            >
-              {selectedModel?.supported_resolutions?.map((res) => (
-                <option key={res} value={res}>
-                  {res}
-                </option>
-              )) ?? <option>Default</option>}
-            </select>
+            <div className="flex gap-3">
+              <select
+                className="h-12 cursor-pointer flex-1 rounded-lg border px-4"
+                value={resolution}
+                onChange={(e) => setResolution(e.target.value)}
+                disabled={!selectedModel?.supported_resolutions?.length}
+              >
+                {selectedModel?.supported_resolutions?.map((res) => (
+                  <option key={res} value={res}>
+                    {res}
+                  </option>
+                )) ?? <option>Default</option>}
+              </select>
 
-            <select
-              className="h-12 cursor-pointer flex-1 rounded-lg border px-4"
-              value={aspectRatio}
-              onChange={(e) => setAspectRatio(e.target.value)}
-              disabled={!selectedModel?.supported_aspect_ratios?.length}
-            >
-              {selectedModel?.supported_aspect_ratios?.map((ar) => (
-                <option key={ar} value={ar}>
-                  {ar}
-                </option>
-              )) ?? <option>1:1</option>}
-            </select>
+              <select
+                className="h-12 cursor-pointer flex-1 rounded-lg border px-4"
+                value={aspectRatio}
+                onChange={(e) => setAspectRatio(e.target.value)}
+                disabled={!selectedModel?.supported_aspect_ratios?.length}
+              >
+                {selectedModel?.supported_aspect_ratios?.map((ar) => (
+                  <option key={ar} value={ar}>
+                    {ar}
+                  </option>
+                )) ?? <option>1:1</option>}
+              </select>
+            </div>
 
             <button
-              className="h-12 rounded-lg cursor-pointer bg-black px-6 text-white font-semibold disabled:opacity-50"
+              className="h-12 w-full sm:w-auto rounded-lg cursor-pointer bg-black px-6 text-white font-semibold disabled:opacity-50"
               onClick={handleGenerate}
               disabled={loading || !selectedModelId}
             >
@@ -276,10 +280,12 @@ const GenerateImages = () => {
           </div>
         </div>
 
-        <div className="flex justify-between mt-3 ml-9 mr-9">
-          <span className="text-lg font-medium">Recent Generations</span>
+        <div className="flex justify-between items-center mt-3 ml-1 mr-1 sm:ml-9 sm:mr-9">
+          <span className="text-base sm:text-lg font-medium">
+            Recent Generations
+          </span>
           <Link to="/dashboard/images">
-            <span className=" relative flex text-sm items-center justify-center">
+            <span className="relative flex text-sm items-center justify-center">
               View All <MoveRight className="w-4 h-3" />
               <span className="absolute flex left-0.5 -bottom-1 w-3/4 h-0.5 bg-black"></span>
             </span>
@@ -292,7 +298,7 @@ const GenerateImages = () => {
           onClose={() => setSelectedImage(null)}
         />
 
-        <div className="grid m-4 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid m-2 sm:m-4 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {recentImages.slice(0, 4).map((img) => (
             <ImageCard
               key={img.id}

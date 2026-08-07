@@ -88,124 +88,124 @@ const Setting = () => {
     return <SettingsSkeleton />;
   }
 
-  return (
-    <div className=" mt-2 ml-9 mr-9 h-full w-auto p-2">
-      <div className=" flex justify-center flex-col">
-        <h1 className="text-xl font-medium mb-1">Settings</h1>
-        <p className="text-sm text-gray-500 mb-6">
-          Manage your account and preferences
-        </p>
-        {/* Profile */}
-        <div className="bg-white border rounded-xl p-5 mb-4">
-          <p className="text-sm font-medium mb-4">Profile</p>
-          <div className="flex gap-3 mb-3">
-            <div className="flex-1">
-              <label className="text-xs text-gray-500 block mb-1">Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="text-xs text-gray-500 block mb-1">Email</label>
-              <input
-                type="email"
-                value={session.user.email}
-                disabled
-                className="w-full border rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-500"
-              />
-            </div>
+return (
+  <div className="mt-2 mx-3 sm:mx-6 md:ml-9 md:mr-9 h-full w-auto p-2">
+    <div className="flex justify-center flex-col">
+      <h1 className="text-xl font-medium mb-1">Settings</h1>
+      <p className="text-sm text-gray-500 mb-6">
+        Manage your account and preferences
+      </p>
+      {/* Profile */}
+      <div className="bg-white border rounded-xl p-4 sm:p-5 mb-4">
+        <p className="text-sm font-medium mb-4">Profile</p>
+        <div className="flex flex-col sm:flex-row gap-3 mb-3">
+          <div className="flex-1">
+            <label className="text-xs text-gray-500 block mb-1">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 text-sm"
+            />
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleSaveProfile}
-              disabled={profileSaving}
-              className="bg-black text-white rounded-lg px-4 py-1.5 text-sm font-medium disabled:opacity-50"
-            >
-              {profileSaving ? "Saving..." : "Save changes"}
-            </button>
-            {profileMessage && (
-              <span className="text-xs text-gray-500">{profileMessage}</span>
-            )}
+          <div className="flex-1">
+            <label className="text-xs text-gray-500 block mb-1">Email</label>
+            <input
+              type="email"
+              value={session.user.email}
+              disabled
+              className="w-full border rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-500"
+            />
           </div>
         </div>
-        {/* Plan status */}
-        <div className="bg-white border rounded-xl p-5 mb-4 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium mb-1">Plan status</p>
-            <p className="text-xs text-gray-500">
-              {me?.isTrialUser
-                ? "Free trial — limited to Riverflow Fast"
-                : "Full access unlocked"}
-            </p>
-          </div>
-          {me?.isTrialUser && (
+        <div className="flex items-center gap-3 flex-wrap">
+          <button
+            onClick={handleSaveProfile}
+            disabled={profileSaving}
+            className="bg-black text-white rounded-lg px-4 py-1.5 text-sm font-medium disabled:opacity-50"
+          >
+            {profileSaving ? "Saving..." : "Save changes"}
+          </button>
+          {profileMessage && (
+            <span className="text-xs text-gray-500">{profileMessage}</span>
+          )}
+        </div>
+      </div>
+      {/* Plan status */}
+      <div className="bg-white border rounded-xl p-4 sm:p-5 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium mb-1">Plan status</p>
+          <p className="text-xs text-gray-500">
+            {me?.isTrialUser
+              ? "Free trial — limited to Riverflow Fast"
+              : "Full access unlocked"}
+          </p>
+        </div>
+        {me?.isTrialUser && (
+          <button
+            onClick={() => (window.location.href = "/pricing")}
+            className="text-sm border rounded-lg px-4 py-1.5 self-start sm:self-auto"
+          >
+            View plans
+          </button>
+        )}
+      </div>
+      {/* Security */}
+      <div className="bg-white border rounded-xl p-4 sm:p-5">
+        <p className="text-sm font-medium mb-4">Security</p>
+
+        <div className="flex items-center justify-between py-2 border-b gap-3">
+          <span className="text-sm">Email verification</span>
+          {session.user.emailVerified ? (
+            <span className="bg-teal-50 text-teal-700 px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap">
+              Verified
+            </span>
+          ) : (
             <button
-              onClick={() => (window.location.href = "/pricing")}
-              className="text-sm border rounded-lg px-4 py-1.5"
+              onClick={handleResendVerification}
+              className="text-xs border rounded-lg px-3 py-1 whitespace-nowrap"
             >
-              View plans
+              Resend verification
             </button>
           )}
         </div>
-        {/* Security */}
-        <div className="bg-white border rounded-xl p-5">
-          <p className="text-sm font-medium mb-4">Security</p>
 
-          <div className="flex items-center justify-between py-2 border-b">
-            <span className="text-sm">Email verification</span>
-            {session.user.emailVerified ? (
-              <span className="bg-teal-50 text-teal-700 px-2.5 py-0.5 rounded-full text-xs font-medium">
-                Verified
-              </span>
-            ) : (
-              <button
-                onClick={handleResendVerification}
-                className="text-xs border rounded-lg px-3 py-1"
-              >
-                Resend verification
-              </button>
-            )}
+        <div className="pt-3">
+          <p className="text-sm mb-2">Change password</p>
+          <div className="flex flex-col sm:flex-row gap-2 mb-2">
+            <input
+              type="password"
+              placeholder="Current password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="flex-1 border rounded-lg px-3 py-2 text-sm"
+            />
+            <input
+              type="password"
+              placeholder="New password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="flex-1 border rounded-lg px-3 py-2 text-sm"
+            />
           </div>
-
-          <div className="pt-3">
-            <p className="text-sm mb-2">Change password</p>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="password"
-                placeholder="Current password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="flex-1 border rounded-lg px-3 py-2 text-sm"
-              />
-              <input
-                type="password"
-                placeholder="New password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="flex-1 border rounded-lg px-3 py-2 text-sm"
-              />
-            </div>
-            {passwordError && (
-              <p className="text-xs text-red-600 mb-2">{passwordError}</p>
-            )}
-            {passwordSuccess && (
-              <p className="text-xs text-green-600 mb-2">Password updated</p>
-            )}
-            <button
-              onClick={handleChangePassword}
-              disabled={passwordSaving || !currentPassword || !newPassword}
-              className="bg-black text-white rounded-lg px-4 py-1.5 text-sm font-medium disabled:opacity-50"
-            >
-              {passwordSaving ? "Updating..." : "Update password"}
-            </button>
-          </div>
+          {passwordError && (
+            <p className="text-xs text-red-600 mb-2">{passwordError}</p>
+          )}
+          {passwordSuccess && (
+            <p className="text-xs text-green-600 mb-2">Password updated</p>
+          )}
+          <button
+            onClick={handleChangePassword}
+            disabled={passwordSaving || !currentPassword || !newPassword}
+            className="bg-black text-white rounded-lg px-4 py-1.5 text-sm font-medium disabled:opacity-50 w-full sm:w-auto"
+          >
+            {passwordSaving ? "Updating..." : "Update password"}
+          </button>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default Setting;
