@@ -70,13 +70,13 @@ export const auth = betterAuth({
   },
   advanced: {
     cookiePrefix: "lumiforge",
-    crossSubDomainCookies: {
-      enabled: true, // if frontend/backend are on different subdomains of the same root domain
-    },
     defaultCookieAttributes: {
-      sameSite: "none",
-      secure: true, // required when sameSite is "none" — cookie only sent over HTTPS
+      sameSite: "lax",   // same-origin via Vercel proxy — no third-party cookie issues
+      secure: true,      // always use HTTPS in production
     },
   },
-  trustedOrigins: [process.env.FRONTEND_URL!],
+  trustedOrigins: [
+    process.env.FRONTEND_URL!,
+    "https://lumiforge-ai.vercel.app",
+  ],
 });

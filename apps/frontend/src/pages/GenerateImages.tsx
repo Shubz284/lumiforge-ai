@@ -231,7 +231,7 @@ const GenerateImages = () => {
 
           <div className="flex flex-col sm:flex-row sm:items-end gap-3 mt-2">
             <select
-              className="h-12 w-full sm:w-[35%] cursor-pointer rounded-lg border px-4"
+              className="h-12 w-full sm:flex-1 sm:min-w-0 cursor-pointer rounded-lg border px-4"
               value={selectedModelId}
               onChange={(e) => setSelectedModelId(e.target.value)}
             >
@@ -242,9 +242,9 @@ const GenerateImages = () => {
               ))}
             </select>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 sm:flex-1">
               <select
-                className="h-12 cursor-pointer flex-1 rounded-lg border px-4"
+                className="h-12 cursor-pointer flex-1 min-w-0 rounded-lg border px-4"
                 value={resolution}
                 onChange={(e) => setResolution(e.target.value)}
                 disabled={!selectedModel?.supported_resolutions?.length}
@@ -257,7 +257,7 @@ const GenerateImages = () => {
               </select>
 
               <select
-                className="h-12 cursor-pointer flex-1 rounded-lg border px-4"
+                className="h-12 cursor-pointer flex-1 min-w-0 rounded-lg border px-4"
                 value={aspectRatio}
                 onChange={(e) => setAspectRatio(e.target.value)}
                 disabled={!selectedModel?.supported_aspect_ratios?.length}
@@ -271,7 +271,7 @@ const GenerateImages = () => {
             </div>
 
             <button
-              className="h-12 w-full sm:w-auto rounded-lg cursor-pointer bg-black px-6 text-white font-semibold disabled:opacity-50"
+              className="h-12 w-full sm:w-auto shrink-0 rounded-lg cursor-pointer bg-black px-6 text-white font-semibold disabled:opacity-50"
               onClick={handleGenerate}
               disabled={loading || !selectedModelId}
             >

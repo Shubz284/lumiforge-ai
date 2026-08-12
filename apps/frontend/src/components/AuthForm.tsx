@@ -61,10 +61,16 @@ const AuthForm = ({ onSuccess, mode }: AuthFormProps) => {
       if (result.error) {
         setError(result.error.message ?? "Signup failed");
       } else {
-        await authClient.getSession();
-        console.log("session after getSession")
-        toast.success("Successfully logged in");
-        onSuccess?.();
+        const session = await authClient.getSession();
+        if (session?.data?.user) {
+          toast.success("Successfully logged in");
+          onSuccess?.();
+        } else {
+          setError(
+            "Login succeeded but session could not be established. " +
+            "Please check your browser's cookie/privacy settings or try a different browser."
+          );
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
